@@ -116,7 +116,7 @@ public class TwitterService extends IntentService {
             Log.i("message", "logined");
 
             try {
-                Uri uri = Uri.parse(twitterService.verifyCredentials().getProfileImageURL());
+                Uri uri = Uri.parse(twitterService.verifyCredentials().getOriginalProfileImageURL());
                 Uri.Builder builder = uri.buildUpon();
                 AsyncTaskHttpRequest task = new AsyncTaskHttpRequest(MainActivity.appFace);
                 task.execute(builder);

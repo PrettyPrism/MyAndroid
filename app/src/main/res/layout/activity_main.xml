@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -36,6 +35,20 @@
         android:layout_above="@+id/locationText"
         android:layout_centerHorizontal="true" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/face"
+        android:layout_marginBottom="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:focusable="false"
+        android:adjustViewBounds="false"
+        android:minHeight="100dp"
+        android:minWidth="100dp" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,6 +57,16 @@
         android:id="@+id/v"
         android:layout_above="@+id/face"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="はろー"
+        android:id="@+id/msg"
+        android:layout_above="@+id/v"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical" />
 
     <Button
         android:layout_width="wrap_content"
@@ -64,28 +87,5 @@
         android:layout_alignBottom="@+id/attension"
         android:layout_alignRight="@+id/v"
         android:layout_alignEnd="@+id/v" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="はろー"
-        android:id="@+id/msg"
-        android:gravity="center_vertical"
-        android:layout_below="@+id/locationText"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp" />
-
-    <ImageView
-        app:srcCompat="@android:color/background_light"
-        android:id="@+id/face"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/mode"
-        android:layout_alignStart="@+id/mode"
-        android:layout_toLeftOf="@+id/providerText"
-        android:layout_toStartOf="@+id/providerText"
-        android:layout_below="@+id/msg" />
 
 </RelativeLayout>
