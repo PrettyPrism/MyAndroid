@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/acceleText"
+        android:layout_marginTop="89dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/providerText"
+        android:layout_alignStart="@+id/providerText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/locationText"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/providerText"
+        android:layout_above="@+id/locationText"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="V"
+        android:id="@+id/v"
+        android:layout_above="@+id/face"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="On"
+        android:id="@+id/attension"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/v"
+        android:layout_toEndOf="@+id/v"
+        android:onClick="attentionSeeker" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="かまってちゃんモード"
+        android:id="@+id/mode"
+        android:layout_alignBottom="@+id/attension"
+        android:layout_alignRight="@+id/v"
+        android:layout_alignEnd="@+id/v" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="はろー"
+        android:id="@+id/msg"
+        android:gravity="center_vertical"
+        android:layout_below="@+id/locationText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp" />
+
+    <ImageView
+        app:srcCompat="@android:color/background_light"
+        android:id="@+id/face"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/mode"
+        android:layout_alignStart="@+id/mode"
+        android:layout_toLeftOf="@+id/providerText"
+        android:layout_toStartOf="@+id/providerText"
+        android:layout_below="@+id/msg" />
+
+</RelativeLayout>
