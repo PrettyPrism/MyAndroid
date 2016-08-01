@@ -84,6 +84,8 @@ public class TwitterService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if(twitterService==null) {
+            //  初回のみ実行
+            //  Twitterのメインのインスタンスを作成
             Log.i("message", "create twitter service");
             String key = intent.getStringExtra(EXTRA_CONSUMER_KEY);
             String key_secret = intent.getStringExtra(EXTRA_CONSUMER_SECRET);
@@ -97,11 +99,13 @@ public class TwitterService extends IntentService {
             twitter4j.conf.Configuration c = cb.build();
             twitterService = new TwitterFactory(c).getInstance();
 
+            //  TLの受け取り（TwitterStream）の作成
             TwitterStream twitterStream = new TwitterStreamFactory(c).getInstance();
             twitterStream.setOAuthAccessToken(new AccessToken(token, token_secret));
             twitterStream.addListener(new MyUserStreamAdapter());
             twitterStream.user();
 
+            //  自分のTwitterアカウントの情報の取得
             try {
                 myUser = twitterService.verifyCredentials();
                 myTweets = twitterService.getUserTimeline(twitterStream.getId());
@@ -116,6 +120,7 @@ public class TwitterService extends IntentService {
             }
             Log.i("message", "logined");
 
+            //  アイコンの取得
             try {
                 Uri uri = Uri.parse(twitterService.verifyCredentials().getOriginalProfileImageURL());
                 Uri.Builder builder = uri.buildUpon();
@@ -125,6 +130,8 @@ public class TwitterService extends IntentService {
                 Log.e("error", e.toString());
             }
         }
+
+        //  ツイートの場合ツイートする
         boolean isTweet = intent.getBooleanExtra(EXTRA_isTweet, false);
         String tweet = intent.getStringExtra(EXTRA_tweet);
         if(isTweet) {
@@ -134,12 +141,9 @@ public class TwitterService extends IntentService {
                 Log.i("twitterService", "tweet is null");
             }
             boolean tweeted = false;
-            Log.i("myTweets.length", ""+myTweets.size());
-            if(myTweets.size()>0) {
-                for(Status t : myTweets) {
-                    if(t.getText().equals(tweet)) {
-                        tweeted = true;
-                    }
+            for(Status t : myTweets) {
+                if(t.getText().equals(tweet)) {
+                    tweeted = true;
                 }
             }
             if(!tweeted) {
@@ -154,9 +158,12 @@ public class TwitterService extends IntentService {
         }
     }
 
+    //  TLの受け取りと受け答え
     private String[] hellotweets = {"おはよーおはよー", "おはよー", "おはモニ", "にゃんぱすー", "おはやっぷー", "おはようのかしこま！"};
     private String[] goodnighttweets = {"おやすみー", "おやすみなさーい", "おやすミルキィ", "おやすみのかしこま～", "ｸﾞﾝﾅｲ･･･"};
     class MyUserStreamAdapter extends UserStreamAdapter {
+
+        //  TLに新着ツイートが来た時に実行されるメソッド
         public synchronized void onStatus(Status status) {
             String username = status.getUser().getScreenName();
             String text = status.getText();
@@ -194,6 +201,7 @@ public class TwitterService extends IntentService {
         }
     }
 
+    //  ツイートメソッド
     void tweet(String tweet) {
         try {
             boolean tweeted = false;
@@ -211,6 +219,8 @@ public class TwitterService extends IntentService {
             Log.i("error", e.getMessage());
         }
     }
+
+    //  特定のStatus（ツイート）に対するリプライ
     void reply(Status status, String tweet) {
         try {
             boolean tweeted = false;
