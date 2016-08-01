@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         attentionMode = (Button)findViewById(R.id.attension);
 
         pref = getSharedPreferences("t4jdata", Activity.MODE_PRIVATE);
-        token=pref.getString("token", "");
-        token_secret=pref.getString("token_secret", "");
+        token = pref.getString("token", "");
+        token_secret = pref.getString("token_secret", "");
 
         twitter.setOAuthConsumer(consumer_key, consumer_secret);
         twitter.getOAuthRequestTokenAsync();

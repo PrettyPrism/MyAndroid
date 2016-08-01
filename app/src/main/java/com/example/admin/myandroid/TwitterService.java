@@ -57,14 +57,14 @@ public class TwitterService extends IntentService {
     final static String EXTRA_isTweet = "extra_isTweet";
     final static String EXTRA_tweet = "extra_tweet";
 
-    private ResponseList<Status> myTweets;
+    static ResponseList<Status> myTweets = null;
 
-    private Twitter twitterService = null;
-    private User myUser;
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
-    private long ownerId;
-    private ArrayList<Long> friendId = new ArrayList<Long>();
+    static Twitter twitterService;
+    static User myUser;
+    static SharedPreferences pref;
+    static SharedPreferences.Editor editor;
+    static long ownerId;
+    static ArrayList<Long> friendId = new ArrayList<Long>();
     Calendar now;
 
     public TwitterService(String name) {
@@ -105,8 +105,9 @@ public class TwitterService extends IntentService {
             try {
                 myUser = twitterService.verifyCredentials();
                 myTweets = twitterService.getUserTimeline(twitterStream.getId());
+                Log.i("myTweets.length", ""+myTweets.size());
             } catch (TwitterException e) {
-                e.printStackTrace();
+                Log.i("read error", e.getMessage());
             }
             pref = getSharedPreferences("t4jdata", Activity.MODE_PRIVATE);
             ownerId = pref.getLong("owner", -1);
@@ -127,21 +128,28 @@ public class TwitterService extends IntentService {
         boolean isTweet = intent.getBooleanExtra(EXTRA_isTweet, false);
         String tweet = intent.getStringExtra(EXTRA_tweet);
         if(isTweet) {
-            Log.i("twitterService", tweet);
-            try {
-                boolean tweeted = false;
+            if(tweet != null) {
+                Log.i("twitterService", tweet);
+            } else {
+                Log.i("twitterService", "tweet is null");
+            }
+            boolean tweeted = false;
+            Log.i("myTweets.length", ""+myTweets.size());
+            if(myTweets.size()>0) {
                 for(Status t : myTweets) {
                     if(t.getText().equals(tweet)) {
                         tweeted = true;
                     }
                 }
-                if(!tweeted) {
-                    myTweets.add(twitterService.updateStatus(tweet));
-                } else {
-                    Log.i("message", tweet+" is already tweeted");
+            }
+            if(!tweeted) {
+                try {
+                myTweets.add(twitterService.updateStatus(tweet));
+                } catch(Exception e) {
+                    Log.i("error", ""+e.getMessage());
                 }
-            } catch(Exception e) {
-                Log.i("error", e.getMessage());
+            } else {
+                Log.i("message", tweet+" is already tweeted");
             }
         }
     }
@@ -223,5 +231,4 @@ public class TwitterService extends IntentService {
     String dateToString(Date date) {
         return new SimpleDateFormat(" MM/dd HH:mm:ss").format(date);
     }
-
 }
