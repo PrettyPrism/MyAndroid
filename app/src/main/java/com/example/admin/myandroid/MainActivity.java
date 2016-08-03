@@ -5,7 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,29 +17,20 @@ import android.location.LocationProvider;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import twitter4j.AsyncTwitter;
 import twitter4j.AsyncTwitterFactory;
-import twitter4j.Status;
 import twitter4j.Twitter;
 //import twitter4j.TwitterAdapter;
-import twitter4j.TwitterAdapter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.TwitterListener;
 import twitter4j.auth.AccessToken;
-import twitter4j.conf.ConfigurationBuilder;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, LocationListener {
     //各種グローバル変数の定義
@@ -61,10 +52,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     boolean endless = false, setDistance = false, isDisTweet = false, isAttention = false;
     float[] data = new float[3];
     float lightS, lightE;
-    int vibra = 0, location_min_time = 0, location_min_distance = 1, TLsize = 10;
+    int vibra = 0, location_min_time = 0, location_min_distance = 1, TLsize = 20, hunger = 30;
     double startLati, endLati, startLong, endLong, distance = 1.0, total = 0.0;
     long start, end, endlessS=0, endlessG=0;
-    TextView time, appMessage;
+    TextView appMessage, PastTL;
     ArrayList<String> tMessage = new ArrayList<String>();
     static ImageView appFace;
 
@@ -85,9 +76,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         data[1] = 0;
         data[2] = 0;
         //各種テキストビューの紐づけ
-        time = (TextView)findViewById(R.id.acceleText);
         appFace = (ImageView) findViewById(R.id.face);
         appMessage = (TextView)findViewById(R.id.msg);
+        appMessage.setTextColor(Color.BLUE);
+        PastTL = (TextView)findViewById(R.id.pastTL);
         attentionMode = (Button)findViewById(R.id.attension);
 
         pref = getSharedPreferences("t4jdata", Activity.MODE_PRIVATE);
@@ -200,9 +192,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (tMessage.size() != 0) {
             String TL = "";
             for (int i = 0; i < tMessage.size(); i++) {
-                TL += tMessage.get(i)+"\n";
+                if (i != tMessage.size()-1) {
+                    TL += tMessage.get(i) + "\n";
+                }
             }
-            appMessage.setText(TL);
+            PastTL.setText(TL);
+            appMessage.setText(tMessage.get(tMessage.size()-1));
         }
     }
 
@@ -231,9 +226,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (tMessage.size() != 0) {
             String TL = "";
             for (int i = 0; i < tMessage.size(); i++) {
-                TL += tMessage.get(i)+"\n";
+                if (i != tMessage.size()-1) {
+                    TL += tMessage.get(i) + "\n";
+                }
             }
-            appMessage.setText(TL);
+            PastTL.setText(TL);
+            appMessage.setText(tMessage.get(tMessage.size()-1));
         }
     }
 
@@ -249,7 +247,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        String m = "";
         float x = 0, y = 0, z = 0;
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER :
@@ -269,14 +266,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             case Sensor.TYPE_LIGHT:
                 break;
         }
-        //情報表示用の処理
-        m += x + "\n";
-        m += y + "\n";
-        m += z + "\n";
-        time.setText(m);
         if (isAttention) {
-            m += ((end - start) / 1000) + "秒";
-            time.setText(m);
             if ((end - start) / 1000 >= 10 && vibra == 0) {
                 //もし一定以上加速度が変わらなかった場合、バイブレーションを起動する
                 ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(new long[]{500, 200, 500, 200}, -1);
@@ -325,12 +315,40 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 else endless = false;
             }
         }
+        Calendar cal = Calendar.getInstance();
+        int iHour = cal.get(Calendar.HOUR);         //時を取得
+        int iMinute = cal.get(Calendar.MINUTE);     //分を取得
+        int iAM_PM = cal.get(Calendar.AM_PM);       //AM or PMを取得 AM = 0, PM = 1
+        if (iAM_PM == 1 && iHour == 12 && hunger%2 == 0) {
+            if (tMessage.size() > TLsize) {
+                tMessage.remove(0);
+            }
+            tMessage.add("お腹がグーグーへりんこファイヤー（涙）");
+            hunger = hunger/2;
+        }
+        else if (iAM_PM == 1 && iHour == 7 && hunger%3 == 0) {
+            if (tMessage.size() > TLsize) {
+                tMessage.remove(0);
+            }
+            tMessage.add("お腹がグーグーへりんこファイヤー（涙）");
+            hunger = hunger/3;
+        }
+        else if (iAM_PM == 0 && iHour == 7 && hunger%5 == 0) {
+            if (tMessage.size() > TLsize) {
+                tMessage.remove(0);
+            }
+            tMessage.add("お腹がグーグーへりんこファイヤー（涙）");
+            hunger = hunger/5;
+        }
         if (tMessage.size() != 0) {
             String TL = "";
             for (int i = 0; i < tMessage.size(); i++) {
-                TL += tMessage.get(i)+"\n";
+                if (i != tMessage.size()-1) {
+                    TL += tMessage.get(i) + "\n";
+                }
             }
-            appMessage.setText(TL);
+            PastTL.setText(TL);
+            appMessage.setText(tMessage.get(tMessage.size()-1));
         }
     }
 
@@ -349,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (isAttention) {
             isAttention = false;
             attentionMode.setText("ON");
+            vibra = 0;
         }
         else {
             isAttention = true;

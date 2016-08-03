@@ -137,23 +137,9 @@ public class TwitterService extends IntentService {
         if(isTweet) {
             if(tweet != null) {
                 Log.i("twitterService", tweet);
+                tweet(tweet);
             } else {
                 Log.i("twitterService", "tweet is null");
-            }
-            boolean tweeted = false;
-            for(Status t : myTweets) {
-                if(t.getText().equals(tweet)) {
-                    tweeted = true;
-                }
-            }
-            if(!tweeted) {
-                try {
-                myTweets.add(twitterService.updateStatus(tweet));
-                } catch(Exception e) {
-                    Log.i("error", ""+e.getMessage());
-                }
-            } else {
-                Log.i("message", tweet+" is already tweeted");
             }
         }
     }
@@ -162,7 +148,6 @@ public class TwitterService extends IntentService {
     private String[] hellotweets = {"おはよーおはよー", "おはよー", "おはモニ", "にゃんぱすー", "おはやっぷー", "おはようのかしこま！"};
     private String[] goodnighttweets = {"おやすみー", "おやすみなさーい", "おやすミルキィ", "おやすみのかしこま～", "ｸﾞﾝﾅｲ･･･"};
     class MyUserStreamAdapter extends UserStreamAdapter {
-
         //  TLに新着ツイートが来た時に実行されるメソッド
         public synchronized void onStatus(Status status) {
             String username = status.getUser().getScreenName();
@@ -203,6 +188,7 @@ public class TwitterService extends IntentService {
 
     //  ツイートメソッド
     void tweet(String tweet) {
+        tweet += " #Cait_B";
         try {
             boolean tweeted = false;
             for(Status t : myTweets) {
@@ -222,6 +208,7 @@ public class TwitterService extends IntentService {
 
     //  特定のStatus（ツイート）に対するリプライ
     void reply(Status status, String tweet) {
+        tweet += " #Cait_B";
         try {
             boolean tweeted = false;
             for(Status t : myTweets) {
