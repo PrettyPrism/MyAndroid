@@ -14,25 +14,6 @@
         android:id="@+id/acceleText"
         android:layout_marginTop="89dp"
         android:layout_alignParentTop="true"
-        android:layout_alignLeft="@+id/providerText"
-        android:layout_alignStart="@+id/providerText" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/locationText"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
-        android:id="@+id/providerText"
-        android:layout_above="@+id/locationText"
         android:layout_centerHorizontal="true" />
 
     <ImageView
@@ -40,14 +21,17 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/face"
-        android:layout_marginBottom="64dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:gravity="center_vertical"
         android:focusable="false"
-        android:adjustViewBounds="false"
+        android:adjustViewBounds="true"
         android:minHeight="100dp"
-        android:minWidth="100dp" />
+        android:minWidth="100dp"
+        android:maxWidth="100dp"
+        android:maxHeight="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:scaleType="centerCrop"
+        android:longClickable="false" />
 
     <TextView
         android:layout_width="wrap_content"

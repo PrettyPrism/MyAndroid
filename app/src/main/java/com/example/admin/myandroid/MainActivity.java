@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import twitter4j.AsyncTwitter;
@@ -60,10 +61,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     boolean endless = false, setDistance = false, isDisTweet = false, isAttention = false;
     float[] data = new float[3];
     float lightS, lightE;
-    int vibra = 0, location_min_time = 0, location_min_distance = 1;
+    int vibra = 0, location_min_time = 0, location_min_distance = 1, TLsize = 10;
     double startLati, endLati, startLong, endLong, distance = 1.0, total = 0.0;
     long start, end, endlessS=0, endlessG=0;
-    TextView time, locate, prov, appMessage;
+    TextView time, appMessage;
+    ArrayList<String> tMessage = new ArrayList<String>();
     static ImageView appFace;
 
     @Override
@@ -84,15 +86,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         data[2] = 0;
         //各種テキストビューの紐づけ
         time = (TextView)findViewById(R.id.acceleText);
-        locate = (TextView)findViewById(R.id.locationText);
-        prov = (TextView)findViewById(R.id.providerText);
         appFace = (ImageView) findViewById(R.id.face);
         appMessage = (TextView)findViewById(R.id.msg);
         attentionMode = (Button)findViewById(R.id.attension);
 
         pref = getSharedPreferences("t4jdata", Activity.MODE_PRIVATE);
-        token = pref.getString("token", "");
-        token_secret = pref.getString("token_secret", "");
+        token=pref.getString("token", "");
+        token_secret=pref.getString("token_secret", "");
 
         twitter.setOAuthConsumer(consumer_key, consumer_secret);
         twitter.getOAuthRequestTokenAsync();
@@ -161,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //位置情報の表示
         m += "緯度 : "+location.getLatitude()+"\n";//緯度の取得
         m += "経度 : "+location.getLongitude()+"\n";//経度の取得
-        locate.setText(m);
         if (!setDistance) {
             //移動前の位置の記録
             startLati = location.getLatitude();
@@ -182,7 +181,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //初期位置のリセット
                 startLati = endLati;
                 startLong = endLong;
-                appMessage.setText("今だいたい" + total + "km移動したよー");
+                if (tMessage.size() > TLsize) {
+                    tMessage.remove(0);
+                }
+                tMessage.add("今だいたい" + total + "km移動したよー");
+                //appMessage.setText("今だいたい" + total + "km移動したよー");
                 if (total >= distance) {
                     //トータルで一定以上移動してたらツイート
                     //isDisTweet = true;
@@ -194,20 +197,43 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         }
+        if (tMessage.size() != 0) {
+            String TL = "";
+            for (int i = 0; i < tMessage.size(); i++) {
+                TL += tMessage.get(i)+"\n";
+            }
+            appMessage.setText(TL);
+        }
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle bundle) {
         switch (status) {
             case LocationProvider.OUT_OF_SERVICE:
-                prov.setText(provider+"が圏外になっていて利用できません");
+                if (tMessage.size() > TLsize) {
+                    tMessage.remove(0);
+                }
+                tMessage.add(provider+"が圏外になっていて利用できません");
                 break;
             case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                prov.setText("一時的に"+provider+"が利用できません");
+                if (tMessage.size() > TLsize) {
+                    tMessage.remove(0);
+                }
+                tMessage.add("一時的に"+provider+"が利用できません");
                 break;
             case LocationProvider.AVAILABLE:
-                prov.setText(provider+"が利用できます");
+                if (tMessage.size() > TLsize) {
+                    tMessage.remove(0);
+                }
+                tMessage.add(provider+"が利用できます");
                 break;
+        }
+        if (tMessage.size() != 0) {
+            String TL = "";
+            for (int i = 0; i < tMessage.size(); i++) {
+                TL += tMessage.get(i)+"\n";
+            }
+            appMessage.setText(TL);
         }
     }
 
@@ -237,7 +263,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     data[2] = z;
                     start = System.currentTimeMillis();
                     vibra = 0;
-                    appMessage.setText("・・・・・・。");
                 }
                 end = System.currentTimeMillis();
                 break;
@@ -256,7 +281,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //もし一定以上加速度が変わらなかった場合、バイブレーションを起動する
                 ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(new long[]{500, 200, 500, 200}, -1);
                 vibra = 1;
-                appMessage.setText("？？？？？？");
+                if (tMessage.size() > TLsize) {
+                    tMessage.remove(0);
+                }
+                tMessage.add("？？？？？？");
+                //appMessage.setText("？？？？？？");
                 Intent intent = new Intent(MainActivity.this, TwitterService.class);
                 intent.putExtra(TwitterService.EXTRA_isTweet, true);
                 intent.putExtra(TwitterService.EXTRA_tweet, "10秒間も音沙汰無し");
@@ -266,7 +295,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //さらに一定以上加速度が変わらなかった場合、バイブレーションを起動する
                 ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(new long[]{500, 600, 500, 600}, -1);
                 vibra = 2;
-                appMessage.setText("もしもーし？");
+                if (tMessage.size() > TLsize) {
+                    tMessage.remove(0);
+                }
+                tMessage.add("もしもーし？");
+                //appMessage.setText("もしもーし？");
                 Intent intent = new Intent(MainActivity.this, TwitterService.class);
                 intent.putExtra(TwitterService.EXTRA_isTweet, true);
                 intent.putExtra(TwitterService.EXTRA_tweet, "20秒も放置されてる・・・つらい・・・");
@@ -277,7 +310,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if (!endless) {
                     endlessS = System.currentTimeMillis();
                     ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(1000);
-                    appMessage.setText("か゛ま゛え゛よ゛お゛お゛お゛お゛お゛お゛お゛お゛!!!!!");
+                    if (tMessage.size() > TLsize) {
+                        tMessage.remove(0);
+                    }
+                    tMessage.add("か゛ま゛っ゛て゛ほ゛し゛い゛!!!!!");
+                    //appMessage.setText("か゛ま゛っ゛て゛ほ゛し゛い゛!!!!!");
                     Intent intent = new Intent(MainActivity.this, TwitterService.class);
                     intent.putExtra(TwitterService.EXTRA_isTweet, true);
                     intent.putExtra(TwitterService.EXTRA_tweet, "構ってほしいなあ・・・");
@@ -287,6 +324,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if ((endlessG - endlessS) < 700) endless = true;
                 else endless = false;
             }
+        }
+        if (tMessage.size() != 0) {
+            String TL = "";
+            for (int i = 0; i < tMessage.size(); i++) {
+                TL += tMessage.get(i)+"\n";
+            }
+            appMessage.setText(TL);
         }
     }
 
