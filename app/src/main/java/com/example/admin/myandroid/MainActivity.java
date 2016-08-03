@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -46,17 +47,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     SharedPreferences.Editor editor;
 
     //主にセンサー関係のグローバル変数
-    private SensorManager asm,lsm;
+    private SensorManager asm,gsm;
     private LocationManager lm;
     private Button attentionMode;
-    boolean endless = false, setDistance = false, isDisTweet = false, isAttention = false;
+    boolean endless = false, setDistance = false, isDisTweet = false, isAttention = false, first = true, up;
     float[] data = new float[3];
-    float lightS, lightE;
-    int vibra = 0, location_min_time = 0, location_min_distance = 1, TLsize = 20, hunger = 30;
+    float lightS, lightE, gyroZ;
+    int vibra = 0, location_min_time = 0, location_min_distance = 1, TLsize = 20, hunger = 30, shake = 0;
     double startLati, endLati, startLong, endLong, distance = 1.0, total = 0.0;
     long start, end, endlessS=0, endlessG=0;
     TextView appMessage, PastTL;
+    ScrollView sView;
     ArrayList<String> tMessage = new ArrayList<String>();
+    ArrayList<float[]> gyroList = new ArrayList<float[]>();
     static ImageView appFace;
 
     @Override
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         //各種センサマネージャとロケーションマネージャの設定
         asm = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-        lsm = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        gsm = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         lm = (LocationManager)getSystemService(Service.LOCATION_SERVICE);
         //時間計測の開始
         start = System.currentTimeMillis();
@@ -135,10 +138,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Sensor s = sensors.get(0);
             asm.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        List<Sensor> sensors2 = lsm.getSensorList(Sensor.TYPE_LIGHT);
+        List<Sensor> sensors2 = gsm.getSensorList(Sensor.TYPE_GYROSCOPE);
         if (sensors2.size() > 0) {
             Sensor s2 = sensors2.get(0);
-            lsm.registerListener(this, s2, SensorManager.SENSOR_DELAY_NORMAL);
+            gsm.registerListener(this, s2, SensorManager.SENSOR_DELAY_NORMAL);
         }
         boolean isNetworkEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (isNetworkEnabled) {
@@ -208,19 +211,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if (tMessage.size() > TLsize) {
                     tMessage.remove(0);
                 }
-                tMessage.add(provider+"が圏外になっていて利用できません");
+                tMessage.add(provider+"が圏外になってて利用できないよー");
                 break;
             case LocationProvider.TEMPORARILY_UNAVAILABLE:
                 if (tMessage.size() > TLsize) {
                     tMessage.remove(0);
                 }
-                tMessage.add("一時的に"+provider+"が利用できません");
+                tMessage.add("一時的に"+provider+"が利用できなくなってるー");
                 break;
             case LocationProvider.AVAILABLE:
                 if (tMessage.size() > TLsize) {
                     tMessage.remove(0);
                 }
-                tMessage.add(provider+"が利用できます");
+                tMessage.add(provider+"は利用できるよー");
                 break;
         }
         if (tMessage.size() != 0) {
@@ -263,7 +266,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
                 end = System.currentTimeMillis();
                 break;
-            case Sensor.TYPE_LIGHT:
+            case Sensor.TYPE_GYROSCOPE :
+                if(first) {
+                    first = false;
+                    up = true;
+                    gyroZ = sensorEvent.values[2];
+                } else {
+                    if(up && sensorEvent.values[2] < gyroZ && sensorEvent.values[2] < -2) {
+                        up = false;
+                        shake++;
+                    } else if(!up && sensorEvent.values[2] > gyroZ && sensorEvent.values[2] > 2) {
+                        up = true;
+                    }
+                    gyroZ = sensorEvent.values[2];
+                }
                 break;
         }
         if (isAttention) {
@@ -314,6 +330,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if ((endlessG - endlessS) < 700) endless = true;
                 else endless = false;
             }
+        }
+        if (shake == 10) {
+            if (tMessage.size() > TLsize) {
+                tMessage.remove(0);
+            }
+            tMessage.add("目が回る～");
+            shake = 0;
         }
         Calendar cal = Calendar.getInstance();
         int iHour = cal.get(Calendar.HOUR);         //時を取得
@@ -374,5 +397,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             start = System.currentTimeMillis();
             attentionMode.setText("OFF");
         }
+    }
+    public void faceClick(View view) {
+        if (tMessage.size() > TLsize) {
+            tMessage.remove(0);
+        }
+        tMessage.add("くすぐったい");
     }
 }

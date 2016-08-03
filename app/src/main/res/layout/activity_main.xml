@@ -21,7 +21,8 @@
         android:scaleType="centerCrop"
         android:longClickable="false"
         android:layout_above="@+id/text"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="faceClick" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -47,7 +48,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/scrollView"
         android:layout_above="@+id/msg"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:focusable="false">
 
         <TextView
             android:layout_width="wrap_content"
