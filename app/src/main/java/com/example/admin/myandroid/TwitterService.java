@@ -58,6 +58,7 @@ public class TwitterService extends IntentService {
     final static String EXTRA_tweet = "extra_tweet";
 
     static ResponseList<Status> myTweets = null;
+    static ArrayList<String> myTweetTexts = new ArrayList<String>();
 
     static Twitter twitterService;
     static User myUser;
@@ -109,6 +110,9 @@ public class TwitterService extends IntentService {
             try {
                 myUser = twitterService.verifyCredentials();
                 myTweets = twitterService.getUserTimeline(twitterStream.getId());
+                for(Status tweet : myTweets) {
+//                    myTweetTexts.add(tweet.getText());
+                }
                 Log.i("myTweets.length", ""+myTweets.size());
             } catch (TwitterException e) {
                 Log.i("read error", e.getMessage());
@@ -191,14 +195,16 @@ public class TwitterService extends IntentService {
         tweet += " #Cait_B";
         try {
             boolean tweeted = false;
-            for(Status t : myTweets) {
-                if(t.getText().equals(tweet)) {
-//                    tweeted = true;
+            for(String t : myTweetTexts) {
+                if(t.equals(tweet)) {
+                    tweeted = true;
                 }
             }
             if(!tweeted) {
                 myTweets.add(twitterService.updateStatus(tweet));
+                myTweetTexts.add(tweet);
             } else {
+                myTweetTexts.add(tweet);
                 Log.i("message", tweet+" is already tweeted");
             }
         } catch(Exception e) {
@@ -211,14 +217,16 @@ public class TwitterService extends IntentService {
         tweet += " #Cait_B";
         try {
             boolean tweeted = false;
-            for(Status t : myTweets) {
-                if(t.getText().equals(tweet)) {
+            for(String t : myTweetTexts) {
+                if(t.equals(tweet)) {
                     tweeted = true;
                 }
             }
             if(!tweeted) {
                 myTweets.add(twitterService.updateStatus(new StatusUpdate("@"+status.getUser().getScreenName()+" "+tweet).inReplyToStatusId(status.getId())));
+                myTweetTexts.add(tweet);
             } else {
+                myTweetTexts.add(tweet);
                 Log.i("message", tweet+" is already tweeted");
             }
         } catch(Exception e) {
