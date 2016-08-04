@@ -193,7 +193,7 @@ public class TwitterService extends IntentService {
             boolean tweeted = false;
             for(Status t : myTweets) {
                 if(t.getText().equals(tweet)) {
-                    tweeted = true;
+//                    tweeted = true;
                 }
             }
             if(!tweeted) {
