@@ -2,38 +2,17 @@ package com.example.admin.myandroid;
 
 import android.app.Activity;
 import android.app.IntentService;
-import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Vibrator;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import twitter4j.ResponseList;
 import twitter4j.StatusUpdate;
@@ -66,7 +45,6 @@ public class TwitterService extends IntentService {
     static SharedPreferences.Editor editor;
     static long ownerId;
     static ArrayList<Long> friendId = new ArrayList<Long>();
-    Calendar now;
 
     public TwitterService(String name) {
         super(name);
@@ -110,9 +88,6 @@ public class TwitterService extends IntentService {
             try {
                 myUser = twitterService.verifyCredentials();
                 myTweets = twitterService.getUserTimeline(twitterStream.getId());
-                for(Status tweet : myTweets) {
-//                    myTweetTexts.add(tweet.getText());
-                }
                 Log.i("myTweets.length", ""+myTweets.size());
             } catch (TwitterException e) {
                 Log.i("read error", e.getMessage());
@@ -204,10 +179,10 @@ public class TwitterService extends IntentService {
                 myTweets.add(twitterService.updateStatus(tweet));
                 myTweetTexts.add(tweet);
             } else {
-                myTweetTexts.add(tweet);
                 Log.i("message", tweet+" is already tweeted");
             }
         } catch(Exception e) {
+            myTweetTexts.add(tweet);
             Log.i("error", e.getMessage());
         }
     }
@@ -226,10 +201,10 @@ public class TwitterService extends IntentService {
                 myTweets.add(twitterService.updateStatus(new StatusUpdate("@"+status.getUser().getScreenName()+" "+tweet).inReplyToStatusId(status.getId())));
                 myTweetTexts.add(tweet);
             } else {
-                myTweetTexts.add(tweet);
                 Log.i("message", tweet+" is already tweeted");
             }
         } catch(Exception e) {
+            myTweetTexts.add(tweet);
             Log.i("error", e.getMessage());
         }
     }
